@@ -106,6 +106,7 @@
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\TAppJob.pubxml" />
     <None Include="Properties\webjob-publish-settings.json" />
+    <None Include="readme - CodeProject.pdf" />
     <None Include="TimerJobUsingApp_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
