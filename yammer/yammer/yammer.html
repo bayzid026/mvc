@@ -2,11 +2,59 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
     <script src="Scripts/jquery-2.1.4.min.js"></script>
+    <style>
+        .noti_Container {
+            position:relative;
+            border:1px solid blue;
+            width:16px;
+            height:16px;
+        }
+        .noti_bubble {
+            position:absolute;
+            top: -6px;
+            right:-6px;
+            padding:1px 2px 1px 2px;
+            background-color:red;
+            color:white;
+            font-weight:bold;
+            font-size:0.55em;
+    
+            border-radius:30px;
+            box-shadow:1px 1px 1px gray;
+        }
+        ul{
+            list-style:none;
+            margin:0px;
+            padding:0px;
+        }
+        .yj-face-item{
+            padding-right: 6px;
+            display: inline-block;
+            vertical-align: top;
+            width: 32px;
+        }
+        .yj-avatar{
+            overflow: hidden;
+            position: relative;
+            width: 48px;
+        }
+        .yj-avatar--link {
+            width: 32px;
+            height: 32px;
+        }
+        .yj-avatar--image
+        {
+            width: 32px;
+            height: 32px;
+        }
+    </style>
 </head>
 <body>
     <!--<div id="embedded-feed" style="height:800px;width:400px;"></div>-->
-    <script type="text/javascript" data-app-id="F3SmuydnkJJQWPxooIQ" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
+    <script type="text/javascript" data-app-id="zqyX6nkeebUtDeaucvqw" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
     <!--<script type="text/javascript">
         yam.connect.embedFeed({
             "network": "sweethome03.onmicrosoft.com",
@@ -65,7 +113,7 @@
             yam.platform.request({
                 // yam.request({
                 url: "activity.json", //this is one of many REST endpoints that are available
-                method: "POST",
+                method: "GET",
                 data: {
                     "activity": {
                         "actor": { "name": "zuhayr bhuiya", "email": "zuhayr@sweethome03.onmicrosoft.com" },
@@ -112,6 +160,210 @@
                 }
             });
         }
+        function getGroupSuggestion() {
+            yam.platform.request({
+                // yam.request({
+                url: 'group_suggestions.json?limit=' + 4,
+                method: "GET",
+                data: {},
+                success: function (group) {
+                    $mygroup = '<ul class="yj-suggested-list--items">';
+                    for ($i = 0; $i < group.length; $i++) {
+                        //$mygroup += '<div  style="float:left"><a href="' + group[$i].suggested.url + '"><img  src="' + group[$i].suggested.mugshot_url + '"/></a></div>';
+                        //$mygroup += '<div><div><a href="' + group[$i].suggested.url + '"><h4>' +group[$i].suggested.full_name +'</h4></a></div><div>' + group[$i].suggested.stats.members + '</div></div>';
+                        //$mygroup += '<div style="clear:both"></div>';
+                        
+                        $mygroup+='<li class="yj-suggestions-item">';
+                        $mygroup += '<div class="img" style="float:left">';
+                        $mygroup+='<div class="yj-avatar-placeholder"><div class="yj-avatar" aria-hidden="true">'; 
+                        $mygroup += '<a class="yj-avatar--link " href="' + group[$i].suggested.web_url + '" tabindex="-1" title="">';
+                        $mygroup += '<img class="yj-avatar--thumb yj-avatar--image" src="' + group[$i].suggested.mugshot_url + '" alt="">';
+                        $mygroup+='</a>';
+                        $mygroup+='</div>';
+                        $mygroup+='</div>';
+                        $mygroup+='</div>';
+                        $mygroup+='<div class="description">';
+                        $mygroup+='<div class="name yj-suggested-list--name">';
+                        $mygroup += '<a class="yj-suggestion-link" href="' + group[$i].suggested.web_url + '">';
+                        $mygroup+= group[$i].suggested.full_name;
+                        $mygroup+= '</a>';
+                        $mygroup+='</div>';
+                        $mygroup+='<div class="position">';
+                        $mygroup+= group[$i].suggested.stats.members + " members";
+                        $mygroup+='</div>';
+                        $mygroup += '<button class="yammer-join" data='+ group[$i].suggested.id +'>Join</button>';
+                        $mygroup += '</div>';
+                        $mygroup += '<div style="clear:both"/>';
+                        $mygroup+='</li>';
+                        
+                    }
+                    $mygroup += '</ul>';
+                    $("#current-groups").html($mygroup);
+                },
+                error: function (group) {
+                    console.error("There was an error with the request.");
+                }
+            });
+        }
+        function getUnreadMessages() {
+            yam.platform.request({
+                // yam.request({
+                url: "networks/current.json",
+                method: "GET",
+                data: {},
+                success: function (networks) {
+                    //  $mygroup = "";
+                    for (var i = 0; i < networks.length; i++) {
+                        if (networks[i].permalink === "acando.com") {
+                            document.getElementById('numberOfMessages').innerHTML = networks[i].unseen_message_count;
+                            document.getElementById('numberOfNotifications').innerHTML = networks[i].unseen_notification_count;
+                        }
+                    }
+                    //$("#current-groups").html($mygroup);
+                },
+                error: function (user) {
+                    console.error("There was an error with the request.");
+                }
+            });
+        }
+        function joinGroup() {
+            var groupId = $(this).attr('data');
+            yam.platform.request({
+                url: 'group_suggestions/' + groupId + '.json',
+                method: 'PUT',
+                success: function (data) {
+                   // deferred.resolve(data);
+                },
+                error: function (error) {
+                   // deferred.reject({ message: error.statusText });
+                }
+            });
+        }
+        function getAutocomplete() {
+            yam.platform.request({
+                // yam.request({
+                url: 'autocomplete/ranked?prefix=&models=user:5,group:5,open_graph_object:5',
+                method: "GET",
+                data: {},
+                success: function (result) {
+                    //  $mygroup = "";
+                    var data = result;
+                    //$("#current-groups").html($mygroup);
+                },
+                error: function (user) {
+                    console.error("There was an error with the request.");
+                }
+            });
+        }
+        function getCurrentUser()
+        {
+            yam.platform.request({
+                url: 'users/current.json?include_group_memberships=true',
+                method: 'GET',
+                success: function (user) {
+                    deferred.resolve(user);
+                },
+                error: function (error) {
+                    deferred.reject({ message: error.statusText });
+                }
+            });
+
+        }
+        function getFollowers() {
+            yam.platform.request({
+                url: 'users/current.json?include_group_memberships=true',
+                method: 'GET',
+                success: function (user) {
+                    var userHTML = "";
+                    userHTML += '<h2 class="yj-user-profile--following-header">';
+                    userHTML += '<a href="' + user.web_url + '/users?is_profile=true" class="yj-user-profile--following-link">';
+                    userHTML += '<span>';
+                    userHTML += 'Followers'
+                    userHTML += '<span class="yj-count badge">';
+                    userHTML += '(' + user.stats.followers + ')'
+                    userHTML += '</span>';
+                    userHTML += '</span>';
+                    userHTML += '</a>';
+                    userHTML += '</h2>';
+                    $("#current-user").html(userHTML);
+                },
+                error: function (error) {
+                    deferred.reject({ message: error.statusText });
+                }
+            });
+            yam.platform.request({
+                url: 'users/following/1543159035.json',
+                method: 'GET',
+                success: function (data) {
+                    //deferred.resolve(user);
+                    var userHTML = "";
+                    userHTML += '<ul class="yj-face-pile">';
+                    var maxFollowers = data.users.length > 10 ? 10 : data.users.length;
+                    for (var i = 0; i < maxFollowers; i++) {
+                        userHTML += '<li class="yj-face-item">';
+                        userHTML+=  '<div class="yj-avatar">';  
+                        userHTML += '<a class="yj-avatar--link " href="' + data.users[i].web_url + '" title="' + data.users[i].full_name + '">';
+                        userHTML += '<img class="yj-avatar--thumb yj-avatar--image" src="' + data.users[i].mugshot_url + '" alt="' + data.users[i].full_name + '" title="" />';
+                        userHTML+=  '</a>';
+                        userHTML += '</div>';
+                        userHTML += '</li>';
+                    }
+                    userHTML += '</ul>';
+                    $("#current-groups").html(userHTML);
+                },
+                error: function (error) {
+                    //deferred.reject({ message: error.statusText });1543159035
+                }
+            });
+
+        }
+        function getFollowing() {
+            yam.platform.request({
+                url: 'users/current.json?include_group_memberships=true',
+                method: 'GET',
+                success: function (user) {
+                    var userHTML = "";
+                    userHTML += '<h2 class="yj-user-profile--following-header">';
+                    userHTML += '<a href="' + user.web_url + '/users?is_profile=true" class="yj-user-profile--following-link">';
+                    userHTML += '<span>';
+                    userHTML += 'Following'
+                    userHTML += '<span class="yj-count badge">';
+                    userHTML += '(' + user.stats.following + ')'
+                    userHTML += '</span>';
+                    userHTML += '</span>';
+                    userHTML += '</a>';
+                    userHTML += '</h2>';
+                    $("#current-user").html(userHTML);
+                },
+                error: function (error) {
+                    deferred.reject({ message: error.statusText });
+                }
+            });
+            yam.platform.request({
+                url: 'users/followed_by/1543159035.json',
+                method: 'GET',
+                success: function (data) {
+                    var userHTML = "";
+                    userHTML += '<ul class="yj-face-pile">';
+                    var maxFollowing = data.users.length > 10 ? 10 : data.users.length;
+                    for (var i = 0; i < maxFollowing; i++) {
+                        userHTML += '<li class="yj-face-item">';
+                        userHTML += '<div class="yj-avatar">';
+                        userHTML += '<a class="yj-avatar--link " href="' + data.users[i].web_url + '" title="' + data.users[i].full_name + '">';
+                        userHTML += '<img class="yj-avatar--thumb yj-avatar--image" src="' + data.users[i].mugshot_url + '" alt="' + data.users[i].full_name + '" title="" />';
+                        userHTML += '</a>';
+                        userHTML += '</div>';
+                        userHTML += '</li>';
+                    }
+                    userHTML += '</ul>';
+                    $("#current-groups").html(userHTML);
+                },
+                error: function (error) {
+                   // deferred.reject({ message: error.statusText });
+                }
+            });
+
+        }
         function login() {
             console.log("Trigger LoginStatus");
             yam.platform.getLoginStatus(
@@ -150,8 +402,14 @@
         $(document).ready(function () {
             $('#disconnect').click(logout);
             $('#yammer-js-login-button').click(login);
-            $('#yammer-user-button').click(postActivity);
+            $('#yammer-current-user-button').click(getCurrentUser);
             $('#yammer-group-button').click(getCurrentGroups);
+            $('#yammer-group-suggestion-button').click(getGroupSuggestion);
+            $('#yammer-unread-message-button').click(getUnreadMessages);
+            $('#yammer-autocomplete-button').click(getAutocomplete);
+            $('#yammer-followers-button').click(getFollowers);
+            $('#yammer-following-button').click(getFollowing);
+            $('body').on("click", '.yammer-join', joinGroup);
         });
 
     </script>
@@ -160,8 +418,15 @@
         <div>
             <h2>JS SDK</h2>
             <button id="yammer-js-login-button">JS Login</button>
-            <button id="yammer-user-button">Get Current User</button>
+            <!--<button id="yammer-user-button">Get Current User</button>-->
             <button id="yammer-group-button">Get Current Groups</button>
+            <button id="yammer-group-suggestion-button">Get Group Suggestions</button>
+            <button id="yammer-unread-message-button">Get Unread Message</button>
+            <button id="yammer-autocomplete-button">Get AutoCmoplete</button>
+            <button id="yammer-current-user-button">Get Current User</button>
+            <button id="yammer-followers-button">Followers</button>
+            <button id="yammer-following-button">Following</button>
+            <div id="current-user"></div>
             <div id="current-groups"></div>
 
         </div>
@@ -174,6 +439,19 @@
             <h2>Authentication Logs</h2>
             <pre id="authResult"></pre>
         </div>
-    </div>
+        <div class="logged-in" style="display:none">
+            <div class="noti_Container">
+                <a href="https://www.yammer.com/acando.com/#/inbox/index">
+                    <img src="http://l-stat.livejournal.com/img/facebook-profile.gif" alt="facebook-profile" />
+                </a>
+                <div id="numberOfMessages" class="noti_bubble"></div>
+            </div>
+            <div class="noti_Container">
+                <a href="https://www.yammer.com/acando.com/#/notifications/index?type=notifications">
+                    <img src="http://l-stat.livejournal.com/img/facebook-profile.gif" alt="facebook-profile" />
+                </a>
+                <div id="numberOfNotifications" class="noti_bubble"></div>
+            </div>
+            </div>
 </body>
 </html>
