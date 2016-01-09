@@ -2,8 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title></title>
-    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">-->
     <script src="Scripts/jquery-2.1.4.min.js"></script>
     <style>
         .noti_Container {
@@ -54,7 +54,7 @@
 </head>
 <body>
     <!--<div id="embedded-feed" style="height:800px;width:400px;"></div>-->
-    <script type="text/javascript" data-app-id="zqyX6nkeebUtDeaucvqw" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
+    <script type="text/javascript" data-app-id="7GtBLb32HQrPtkXQeevqQ" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
     <!--<script type="text/javascript">
         yam.connect.embedFeed({
             "network": "sweethome03.onmicrosoft.com",
@@ -211,10 +211,13 @@
                 url: "networks/current.json",
                 method: "GET",
                 data: {},
+                beforeSend: function (req) { //print message response information to the console
+                    yam.platform.setAuthToken(localStorage.getItem(1));
+                },
                 success: function (networks) {
                     //  $mygroup = "";
                     for (var i = 0; i < networks.length; i++) {
-                        if (networks[i].permalink === "acando.com") {
+                        if (networks[i].permalink === "bybrick.se") {
                             document.getElementById('numberOfMessages').innerHTML = networks[i].unseen_message_count;
                             document.getElementById('numberOfNotifications').innerHTML = networks[i].unseen_notification_count;
                         }
@@ -292,7 +295,7 @@
                 }
             });
             yam.platform.request({
-                url: 'users/following/1543159035.json',
+                url: 'users/following/1559918292.json',
                 method: 'GET',
                 success: function (data) {
                     //deferred.resolve(user);
@@ -340,7 +343,7 @@
                 }
             });
             yam.platform.request({
-                url: 'users/followed_by/1543159035.json',
+                url: 'users/followed_by/1559918292.json',
                 method: 'GET',
                 success: function (data) {
                     var userHTML = "";
